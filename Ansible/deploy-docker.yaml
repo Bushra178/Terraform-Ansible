@@ -1,0 +1,101 @@
+---
+- name: Wait for ssh connection
+  hosts:
+  gather_facts: False
+  task:
+    - name: ensure ssh connection
+      wait_for:
+        port: 22
+        delay: 10
+        timeout: 100
+        search_regex: OpenSHH
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+      vars:
+        ansible_connection: local
+        ansible_python_interpreter: /usr/bin/python
+    
+
+
+- name: Install Docker
+  hosts: all
+  become: yes
+  gather_facts: False
+  tasks:
+    - name: Install Python3 and docker
+      vars: 
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name: 
+          - python3
+          - docker
+        update_cache: yes
+        state: present
+
+- name: Install docker-compose
+  hosts: all
+  become: yes
+  tasks:
+    - name: Download docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+    - name: Install docker python module
+      vars:
+        ansible_python_interpreter: /usr/bin/python3
+      pip:
+        name: 
+          - docker
+          - docker-compose
+
+
+- name: Start Docker Daemon
+  hosts: all
+  become: yes
+  tasks:
+    - name: Start docker daemon
+      systemd:
+        name: docker
+        state: started
+    
+    
+- name: Add ec2-user to docker group
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add User
+      user: 
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reconnect server
+      meta: reset_connection
+
+
+- name: Test docker run
+  hosts: all
+  tasks:
+    - name: Pull redis
+      docker_image:
+        - name: redis
+          source: pull
+
+
+- name: Start docker container
+  hosts: all
+  vars_files:
+    - project-vars
+  tasks:
+    - name: copy docker compose file
+      copy:
+        src: /root/ansible/docker-compose-full.yaml
+        dest: /home/ec2-user/docker-compose.yaml
+    - name: Docker login
+      docker_login:
+        registry_url: https://index.docker.io/v1/
+        username: fatima0
+        password: "{{password}}"
+    - name: Run docker-compose
+      docker_compose:
+        project_src: /home/ec2-user
+        #state: present docker-compose up, present is the default state, so we don't specify

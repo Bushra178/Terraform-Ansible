@@ -1,0 +1,44 @@
+---
+- name: Install node and npm
+  hosts: 165.232.182.207
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: Install nodejs and npm
+      apt: 
+        pkg:
+          - nodejs
+          - npm
+
+
+- name: Create new User
+  hosts: 165.232.182.207
+  tasks:
+    - name: Create Linux User
+      user:
+        name: fatima
+        comment: fatima admin
+        group: admin
+
+- name: Deploy nodejs App
+  hosts: 165.232.182.207
+  become: True
+  become_user: fatima
+  tasks:   
+    - name: Unpack tar file
+      unarchive: 
+        src: /root/my-app-0.1.0.tgz
+        dest: /home/fatima
+    - name: Install Dependencies
+      npm:
+        path: /home/fatima/package
+    - name: Start the Application
+      command:
+        chdir: /home/fatima/package/src
+        cmd: node server
+      async: 1000
+      poll: 0
+    - name: Ensure App is Running
+      shell: ps aux | grep node
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}

@@ -1,0 +1,106 @@
+---
+- name: Install Java and net-tools
+  hosts: nexus_server
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: install Java 8
+      apt: name=openjdk-8-jre-headless
+    - name: Install net-tools
+      apt: name=net-tools
+
+
+- name: Download and unpack Nexus Installer
+  hosts: nexus_server
+  tasks:
+    - name: Check Nexus Folder Stats
+      stat:
+        path: /opt/nexus
+      register: stat_result
+    - name: Download Nexus
+      get_url:
+        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+        dest: /opt/
+      register: download_result
+    - name: untar nexus installer
+      unarchive: 
+        src: "{download_result.dest}"
+        dest: /opt/
+        remote_src: yes
+      when: not stat_result.stat.exists
+    - name: Find Nexus Folder
+      find:
+        paths: /opt
+        pattern: "nexus-*"
+        file_type: directory
+      register: find_result
+    
+    - name: Rename Nexus Folder
+      shell: mv {{find_result.files[0].path}} /opt/nexus
+      when: not stat_result.stat.exists
+
+####
+- name: Create Nexus User to own Nexus Folder
+  hosts: nexus_server
+  tasks:
+    - name: Ensure and Create Nexus Group
+      group:
+        name: nexus
+        stat: present
+    - name: Create Nexus User
+      user:
+        name: nexus
+        group: nexus
+    - name: Make Nexus User Ownership of Nexus Folder
+      file: 
+        path: /opt/nexus
+        state: directory
+        owner: nexus
+        group: nexus
+        recurse: yes
+    - name: Make Nexus User Ownership of Sonatype work Folder
+      file: 
+        path: /opt/sonatype-work
+        state: directory
+        owner: nexus
+        group: nexus
+        recurse: yes
+
+
+- name: Start with Nexus User
+  hosts: nexus_server
+  become: True
+  become_user: nexus
+  tasks:
+    - name: Set run_as_user_nexus
+      lineinfile:
+        path: /opt/nexus/bin/nexus.rc
+        regexp: '^#run_as_user=""'
+        line: run_as_user="nexus"
+    - name: Run Nexus
+      command: /opt/nexus/bin/nexus start
+
+
+- name: verify nexus running
+  hosts: nexus_server
+  tasks:
+    - name: Check with ps
+      shell: ps aux | grep nexus
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}
+    - name: Wait One minute
+      pause: 
+        minutes: 1
+    - name: Check with netstat
+      shell: netstat -plnt
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}
+
+
+      
+
+
+
+
+
+#blockinfile module: insert/update/remove  multiline text sorrounded by customizeable marker lines

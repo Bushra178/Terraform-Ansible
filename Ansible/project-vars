@@ -1,0 +1,2 @@
+password: dockerpassword
+user_groups: adm, docker 
