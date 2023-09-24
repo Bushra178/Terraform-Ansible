@@ -8,5 +8,8 @@
 #tf variable files, may onclude sensitive data
 *.tfvars
 
-#ignore crashlogs
-crash.log
+.txt
+.csv
+id_rsa
+id_rsa.pub
+terraform/terra-basic/admin_accessKeys.csv
