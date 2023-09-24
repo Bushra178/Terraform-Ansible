@@ -1,0 +1,25 @@
+1)to see the plan of action, what terraform is gonna do, gives same output as apply command but doesn't execute 
+terraform plan
+
+2)for all yes
+terraform apply -auto-approve
+
+3)delete everything
+terraform destroy
+
+4)see all data about resources
+terraform state
+terraform state show <resource-name>
+
+5) pass variable
+a)if we don't pass any value, we'll have to enter it by cmd prmpt
+b)we can pass it as 'terraform apply -var "name=value"'
+c) make a file terraform.tfvars and put all variables in there, if we name the file anthing other than terraform we have to define it like
+terraform apply -var-file <file-name>
+d) we can pass default value in variable in case there isn't any value defined default will be used. We can define variable type as well.
+we can declare an array or list of objects of variables and get them like [0] 
+
+---set custom environment variables---
+
+export TF_VAR_VAR_NAME="VALUE"             do this in cmd to set env variables, TF_VAR is a prefix
+declare variable in file, variable var_name {} and get it as var.name

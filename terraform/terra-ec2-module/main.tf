@@ -1,8 +1,8 @@
 # run "terraform init" command to install aws provider
 provider "aws" {
     region = "ap-south-1"
-    access_key = "AKIA5PCN6HLAYSVBKQVT"
-    secret_key = "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"
+    access_key = "AKIA5PCN6HLATMRPA2YZ"
+    secret_key = "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"
 }
 
 resource "aws_vpc" "myapp-vpc" {

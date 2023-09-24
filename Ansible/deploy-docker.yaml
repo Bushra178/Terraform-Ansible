@@ -2,7 +2,7 @@
 - name: Wait for ssh connection
   hosts:
   gather_facts: False
-  task:
+  tasks:
     - name: ensure ssh connection
       wait_for:
         port: 22

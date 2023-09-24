@@ -67,7 +67,7 @@ resource "aws_instance" "myapp-server" {
     }
 
     # provisioner "local-exec" {
-    # working_dir = "C:/Users/Bushra Fatima/Documents/Ansible"
+    # working_dir = "C/root/Terraform-Ansible/Ansible:/Users/Bushra Fatima/Documents/Ansible"
     # command = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh-key-private} --user ec2-user deploy-docker.yaml"
 # }
 }
@@ -78,7 +78,7 @@ resource "null_resource" "configure-server" {
     #we van define a list of IPs here
   }
   provisioner "local-exec" {
-    working_dir = "C:/Users/Bushra Fatima/Documents/Ansible"
+    working_dir = "/root/Terraform-Ansible/Ansible"
     command = "ansible-playbook --inventory ${aws_instance.myapp-server.public_ip}, --private-key ${var.ssh-key-private} --user ec2-user deploy-docker.yaml"
 }
 }
