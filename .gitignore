@@ -12,3 +12,4 @@
 .csv
 id_rsa
 id_rsa.pub
+terraform/terra-basic/admin_accessKeys.csv
