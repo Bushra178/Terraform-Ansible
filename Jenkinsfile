@@ -6,7 +6,7 @@ pipeline {
         maven 'Maven'
     }
     environment {
-        IMAGE_NAME = 'nanajanashia/demo-app:java-maven-2.0'
+        IMAGE_NAME = 'fatima0/my-repo:java-maven-3.0'
     }
     stages {
         stage('build app') {
