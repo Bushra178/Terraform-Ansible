@@ -1,14 +1,7 @@
-terraform {
-    required_version = ">= 0.12"
-    backend "s3" {
-        bucket = "myapp-bucket"
-        key = "myapp/state.tfstate"
-        region = "eu-west-3"
-    }
-}
-
 provider "aws" {
     region = var.region
+    access_key = "AKIA5PCN6HLATMRPA2YZ"
+    secret_key = "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"
 }
 
 resource "aws_vpc" "myapp-vpc" {
