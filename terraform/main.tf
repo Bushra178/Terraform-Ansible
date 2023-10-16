@@ -1,7 +1,5 @@
 provider "aws" {
     region = var.region
-    access_key = "AKIA5PCN6HLATMRPA2YZ"
-    secret_key = "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"
 }
 
 resource "aws_vpc" "myapp-vpc" {
